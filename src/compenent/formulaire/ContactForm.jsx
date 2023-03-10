@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './ContactForm.css';
-import NavBar from '../navBar/NavBar';
 
 function ContactForm() {
   const [firstName, setFirstName] = useState('');
@@ -10,12 +9,10 @@ function ContactForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // effectue une action lorsque le formulaire est soumis, par exemple envoie des données à un serveur
   };
 
   return (
     <div>
-      <NavBar />
       <form onSubmit={handleSubmit} className='contact-form'>
         <div className='form-group'>
           <label htmlFor='first-name'>Prénom:</label>

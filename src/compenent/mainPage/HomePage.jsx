@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import NavBar from '../navBar/NavBar';
-import Footer from '../footer/Footer';
 import './HomePage.css';
-import getMovies from './GetMovies';
-import ContactForm from '../formulaire/ContactForm';
-import TagSection from '../tagSection/TagSection';
-import Questionnaire from '../questions/Questionnaire';
-
-const defaultPoster =
-  'https://via.placeholder.com/500x750.png?text=Image+not+available';
+import axios from 'axios';
+import SearchBar from '../searchBar/SearchBar';
+import MovieList from '../movieList/MovieList';
 
 const HomePage = () => {
   const [movies, setMovies] = useState([]);
@@ -23,51 +17,36 @@ const HomePage = () => {
     fetchMovies();
   }, [query]);
 
+  const getMovies = async (query = '') => {
+    const defaultQuery = '';
+    query = query.trim() || defaultQuery;
+    let page = 1;
+    const results = [];
+
+    try {
+      while (page <= 2) {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/search/multi?api_key=e5952f2708f5284e252d4e51b51aec21&query=${query}&page=${page}`
+        );
+        results.push(...response.data.results);
+        page++;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    return results;
+  };
+
   return (
     <div>
-      <NavBar />
       <h1 className='page-title'>Kesqu'onRegarde</h1>
-      <div className='search-container'>
-        <input
-          className='search-input'
-          type='text'
-          placeholder='Cherchez votre film...'
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
+      <SearchBar query={query} setQuery={setQuery} />
       <div className='question-section'>
-        <div>
-          <Questionnaire />
-          <TagSection />
-        </div>
-        <section className='movies-section'>
-          {movies.map((movie) => (
-            <article className='movie-card' key={movie.id}>
-              <div className='movie-poster'>
-                <img
-                  src={
-                    movie.poster_path
-                      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                      : defaultPoster
-                  }
-                  alt={movie.title}
-                />
-              </div>
-              <p className='movie-title'>{movie.title}</p>
-              <p className='movie-title'>
-                {movie.vote_average
-                  ? movie.vote_average.toFixed(1) + '/10 ⭐'
-                  : '-'}
-              </p>
-
-              {/* <p className='movie-title'>{movie.overview}</p> */}
-            </article>
-          ))}
-        </section>
+        <MovieList movies={movies} />
       </div>
-      <Footer />
     </div>
   );
 };
+
 export default HomePage;
